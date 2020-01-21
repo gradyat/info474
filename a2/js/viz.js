@@ -34,7 +34,7 @@ function line(x1, y1, x2, y2) {
 function findMinMax(data) {
     let toeflScores = data.map((row) => parseInt(row["TOEFL Score"]));
     let admissionRates = data.map((row) => parseFloat(row["Chance of Admit"]));
-    regressionConstants = linearRegression(greScores, admissionRates);
+    regressionConstants = linearRegression(toeflScores, admissionRates);
 
     // get x-axis min and max
     let xMax = Math.max.apply(Math, toeflScores);
@@ -128,4 +128,76 @@ function toCanvasPoint(point) {
         x: xCanvas,
         y: yCanvas
     }
+}
+
+function regressionLine(toeflScore) {
+    return {
+        // calculate Chance of Admit
+        "Chance of Admit": Math.round((toeflScore * regressionConstants.a + regressionConstants.b) * 100) / 100,
+        "TOEFL Score": toeflScore
+    }
+}
+
+// Draw the regression line
+function drawRegressionLine() {
+    let startPoint = regressionLine(290); // Use 290 as line start point
+    let endPoint = regressionLine(340); // Use 340 as line end point
+
+    // convert points to Canvas points
+    startPoint = toCanvasPoint(startPoint);
+    endPoint = toCanvasPoint(endPoint);
+
+    // draw regression line
+    line(startPoint.x, startPoint.y, endPoint.x, endPoint.y);
+}
+
+function linearRegression(independent, dependent) {
+    let lr = {};
+
+    let independent_mean = arithmeticMean(independent);
+    let dependent_mean = arithmeticMean(dependent);
+    let products_mean = meanOfProducts(independent, dependent);
+    let independent_variance = variance(independent);
+
+    lr.a = (products_mean - (independent_mean * dependent_mean)) / independent_variance;
+
+    lr.b = dependent_mean - (lr.a * independent_mean);
+
+    return lr;
+}
+
+
+function arithmeticMean(data) {
+    let total = 0;
+
+    // note that incrementing total is done within the for loop
+    for (let i = 0, l = data.length; i < l; total += data[i], i++);
+
+    return total / data.length;
+}
+
+
+function meanOfProducts(data1, data2) {
+    let total = 0;
+
+    // note that incrementing total is done within the for loop
+    for (let i = 0, l = data1.length; i < l; total += (data1[i] * data2[i]), i++);
+
+    return total / data1.length;
+}
+
+
+function variance(data) {
+    let squares = [];
+
+    for (let i = 0, l = data.length; i < l; i++) {
+        squares[i] = Math.pow(data[i], 2);
+    }
+
+    let mean_of_squares = arithmeticMean(squares);
+    let mean = arithmeticMean(data);
+    let square_of_mean = Math.pow(mean, 2);
+    let variance = mean_of_squares - square_of_mean;
+
+    return variance;
 }
