@@ -13,15 +13,28 @@ function makeScatterPlot(data) {
     drawAxesLines();
     let axesLimits = findMinMax(data);
     drawAxesTicks(axesLimits);
+    drawAxesLabels();
 
     for (let i = 0; i < 400; i++) {
         plotCanvasPoint(data[i]);
     }
+
+    drawRegressionLine();
 }
 
 function drawAxesLines() {
     line(50, 50, 50, 450);
     line(50, 450, 450, 450);
+}
+
+function drawAxesLabels() {
+    context.font = "10pt Arial";
+    context.fillText("TOEFL Score", 175, 490);
+    context.save();
+    context.translate(12, 480);
+    context.rotate(-Math.PI/2);
+    context.fillText("Chance of Admit", 175, 0);
+    context.restore();
 }
 
 function line(x1, y1, x2, y2) {
@@ -95,12 +108,9 @@ function drawAxesTicks(axesLimits) {
 
 function plotPoint(x, y) {
     context.beginPath();
-    //context.arc(x, y, 5, 0, 2 * Math.PI, false); old arc
     context.arc(x, y, 3, 0, 2 * Math.PI, false); // made point area smaller
-    //context.fillStyle = 'green'; old fill fillStyle
     context.fillStyle = '#4286f4'; // changed color to blue
     context.fill();
-    //context.lineWidth = 5; old lineWidth
     context.lineWidth = 1; // made line width smaller
     context.strokeStyle = '#003300';
     context.stroke();
@@ -121,7 +131,7 @@ function plotCanvasPoint(point) {
 }
 
 function toCanvasPoint(point) {
-    const xCanvas = (point["TOEFL Score"] - 285) * 6 + 50; // scale the x point
+    const xCanvas = (point["TOEFL Score"] - 87) * 6 + 50; // scale the x point
     const yCanvas = 450 - (point["Chance of Admit"] - 0.3) * 500; // scale the y point
     // return new x and y
     return {
@@ -130,18 +140,10 @@ function toCanvasPoint(point) {
     }
 }
 
-function regressionLine(toeflScore) {
-    return {
-        // calculate Chance of Admit
-        "Chance of Admit": Math.round((toeflScore * regressionConstants.a + regressionConstants.b) * 100) / 100,
-        "TOEFL Score": toeflScore
-    }
-}
-
 // Draw the regression line
 function drawRegressionLine() {
-    let startPoint = regressionLine(290); // Use 290 as line start point
-    let endPoint = regressionLine(340); // Use 340 as line end point
+    let startPoint = regressionLine(86);
+    let endPoint = regressionLine(124);
 
     // convert points to Canvas points
     startPoint = toCanvasPoint(startPoint);
@@ -149,6 +151,14 @@ function drawRegressionLine() {
 
     // draw regression line
     line(startPoint.x, startPoint.y, endPoint.x, endPoint.y);
+}
+
+function regressionLine(toeflScore) {
+    return {
+        // calculate Chance of Admit
+        "Chance of Admit": Math.round((toeflScore*regressionConstants.a + regressionConstants.b) * 100) / 100,
+        "TOEFL Score": toeflScore
+    }
 }
 
 function linearRegression(independent, dependent) {
