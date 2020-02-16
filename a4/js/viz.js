@@ -21,7 +21,7 @@
             .attr('width', 700)
             .attr('height', 500);
         // d3.csv is basically fetch but it can be be passed a csv file as a parameter
-        d3.csv("../data/pokemon.csv")
+        d3.csv("/data/pokemon.csv")
             .then((data) => makeScatterPlot(data));
     }
 
