@@ -9,9 +9,9 @@ const svg = d3.select("body").append('svg')
 
 const g = svg.append('g')
 
-d3.json('/data/nygeo.json').then(function (data) {
+d3.json('./data/nygeo.json').then(function (data) {
 
-    d3.json('/data/airbnb.json').then(function (pointData) {
+    d3.json('./data/airbnb.json').then(function (pointData) {
 
         const albersProj = d3.geoAlbers()
             .scale(74000)
